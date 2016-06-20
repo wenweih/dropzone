@@ -139,6 +139,7 @@ class Dropzone extends Emitter
     maxThumbnailFilesize: 10 # in MB. When the filename exceeds this limit, the thumbnail will not be generated.
     thumbnailWidth: 120
     thumbnailHeight: 120
+    blacklist_file: []
 
     # The base that is used to calculate the filesize. You can change this to
     # 1024 if you would rather display kibibytes, mebibytes, etc...
@@ -251,6 +252,9 @@ class Dropzone extends Emitter
     # Displayed when the maxFiles have been exceeded
     # You can use {{maxFiles}} here, which will be replaced by the option.
     dictMaxFilesExceeded: "You can not upload any more files."
+
+    #
+    dictBlackList:  "The file your upload is blocked."
 
 
     # If `done()` is called without argument the file is accepted
@@ -938,6 +942,8 @@ class Dropzone extends Emitter
     else if @options.maxFiles? and @getAcceptedFiles().length >= @options.maxFiles
       done @options.dictMaxFilesExceeded.replace "{{maxFiles}}", @options.maxFiles
       @emit "maxfilesexceeded", file
+    else if @options.blacklist_file.indexOf(file.name) != -1
+      return done(@options.dictBlackList)
     else
       @options.accept.call this, file, done
 

@@ -125,6 +125,7 @@
       maxThumbnailFilesize: 10,
       thumbnailWidth: 120,
       thumbnailHeight: 120,
+      blacklist_file: [],
       filesizeBase: 1000,
       maxFiles: null,
       params: {},
@@ -150,6 +151,7 @@
       dictRemoveFile: "Remove file",
       dictRemoveFileConfirmation: null,
       dictMaxFilesExceeded: "You can not upload any more files.",
+      dictBlackList: "The file your upload is blocked.",
       accept: function(file, done) {
         return done();
       },
@@ -260,7 +262,7 @@
           _ref = file.previewElement.querySelectorAll("[data-dz-name]");
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             node = _ref[_i];
-            node.textContent = this._renameFilename(file.name);
+            node.textContent = this._renameFilename(file.name, file);
           }
           _ref1 = file.previewElement.querySelectorAll("[data-dz-size]");
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
@@ -721,11 +723,11 @@
       }
     };
 
-    Dropzone.prototype._renameFilename = function(name) {
+    Dropzone.prototype._renameFilename = function(name, file) {
       if (typeof this.options.renameFilename !== "function") {
         return name;
       }
-      return this.options.renameFilename(name);
+      return this.options.renameFilename(name, file);
     };
 
     Dropzone.prototype.getFallbackForm = function() {
@@ -970,6 +972,8 @@
       } else if ((this.options.maxFiles != null) && this.getAcceptedFiles().length >= this.options.maxFiles) {
         done(this.options.dictMaxFilesExceeded.replace("{{maxFiles}}", this.options.maxFiles));
         return this.emit("maxfilesexceeded", file);
+      } else if (this.options.blacklist_file.indexOf(file.name) !== -1) {
+        return done(this.options.dictBlackList);
       } else {
         return this.options.accept.call(this, file, done);
       }
@@ -1377,7 +1381,7 @@
         }
       }
       for (i = _m = 0, _ref5 = files.length - 1; 0 <= _ref5 ? _m <= _ref5 : _m >= _ref5; i = 0 <= _ref5 ? ++_m : --_m) {
-        formData.append(this._getParamName(i), files[i], this._renameFilename(files[i].name));
+        formData.append(this._getParamName(i), files[i], this._renameFilename(files[i].name, files[i]));
       }
       return this.submitRequest(xhr, formData, files);
     };
