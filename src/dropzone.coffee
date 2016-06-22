@@ -140,6 +140,7 @@ class Dropzone extends Emitter
     thumbnailWidth: 120
     thumbnailHeight: 120
     duplicate: true
+    blacklist_file: []
 
     # The base that is used to calculate the filesize. You can change this to
     # 1024 if you would rather display kibibytes, mebibytes, etc...
@@ -255,6 +256,9 @@ class Dropzone extends Emitter
     # Displayed when the maxFiles have been exceeded
     # You can use {{maxFiles}} here, which will be replaced by the option.
     dictMaxFilesExceeded: "You can not upload any more files."
+
+    #
+    dictBlackList:  "The file your upload is blocked."
 
 
     # If `done()` is called without argument the file is accepted
@@ -953,6 +957,8 @@ class Dropzone extends Emitter
         done @options.dictDuplicateName
       else
         @options.accept.call this, file, done
+    else if @options.blacklist_file.indexOf(file.name) != -1
+      return done(@options.dictBlackList)
     else
       @options.accept.call this, file, done
 
